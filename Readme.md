@@ -1,7 +1,7 @@
 # Личный проект «Кексобукинг» [![Build status][travis-image]][travis-url]
 
 * Студент: [Максим Непорада](https://up.htmlacademy.ru/javascript/14/user/601999).
-* Наставник: `Неизвестно`.
+* Наставник: [Дмитрий Донецкий](https://up.htmlacademy.ru/javascript/14/user/497669).
 
 ---
 

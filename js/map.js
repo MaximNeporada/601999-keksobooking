@@ -123,7 +123,7 @@ var greateMapElement = function () {
   };
 
   // функция создания и установка фотографий
-  var createPhoto = function(arrayPhoto, photoElement, photoBlock) {
+  var createPhoto = function (arrayPhoto, photoElement, photoBlock) {
     for (var l = 0; l < arrayPhoto.length; l++) {
       var photo = photoElement.cloneNode(true);
       photo.style.verticalAlign = 'bottom';
@@ -135,16 +135,14 @@ var greateMapElement = function () {
   };
 
   // функция установки опций
-  var greateOption = function(arrayOption,OptionBlock) {
+  var greateOption = function (arrayOption, OptionBlock) {
     for (var j = 0; j < arrayOption.length; j++) {
       var li = document.createElement('LI');
       li.classList.add('feature', 'feature--' + arrayOption[j]);
       OptionBlock.appendChild(li);
     }
-  }
-
+  };
   // функция создания попапа на основе данных объекта
-
   var createPopup = function (object) {
     var templatePopup = document.querySelector('template');
     var mapCard = templatePopup.content.querySelector('.map__card');
@@ -168,7 +166,7 @@ var greateMapElement = function () {
     var popupFeatures = popup.querySelector('.popup__features');
     popupFeatures.innerHTML = '';
     var arrayFeatures = object.offer.features;
-    greateOption(arrayFeatures,popupFeatures);// установка опций
+    greateOption(arrayFeatures, popupFeatures);// установка опций
 
     popupFeatures.nextElementSibling.textContent = object.offer.description; // установка описания
 

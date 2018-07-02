@@ -1,4 +1,8 @@
 'use strict';
+var MAIN_PIN_AFFTER = 22;// взято из css
+var mapPinMain = document.querySelector('.map__pin--main');
+var addressInput = document.querySelector('#address');
+var map = document.querySelector('.map');
 var greateMapElement = function () {
 
   var AVATARS = [
@@ -43,13 +47,13 @@ var greateMapElement = function () {
     'bungalo': 'Бунгало',
     'house': 'Дом'
   };
+
   // функция получения случайного числа от min до max не включая max
   var getRandomInt = function (min, max) {
     return Math.floor(Math.random() * (max - min)) + min;
   };
 
   // функция создания массива случайных данных
-
   var createRandomArray = function (array, count, sort) {
     var result = [];
     var tempArray = array.slice(0);
@@ -88,7 +92,7 @@ var greateMapElement = function () {
           'checkout': ['12:00', '13:00', '14:00'][getRandomInt(0, 3)],
           'features': createRandomArray(FEATURES, getRandomInt(1, FEATURES.length)),
           'description': '',
-          'photos': createRandomArray(PHOTOS, 3)
+          'photos': createRandomArray(PHOTOS, 3, false)
         },
         'location': {
           'x': locationX,
@@ -103,7 +107,6 @@ var greateMapElement = function () {
   };
 
   // Создание кнопок на основе данных из списка объектов
-
   var createButtons = function (objects) {
     var documentFragment = document.createDocumentFragment();
     for (var i = 0; i < objects.length; i++) {
@@ -173,16 +176,68 @@ var greateMapElement = function () {
     createPhoto(arrayObjectPhoto, popupPicturesElement, popupPictures);
 
     popupPictures.removeChild(popupPictures.children[0]);
-    return popup;
-  };
+    map.appendChild(popup);
 
-  var map = document.querySelector('.map');
+    // нажатие на кнопку крестик попапа
+    var buttonClosePopup = document.querySelector('.popup__close');
+    buttonClosePopup.addEventListener('click', removeMapCards);
+  };
+  // функции очиски карты от попапов
+  var removeMapCards = function () {
+    var cards = document.querySelectorAll('.map__card');
+    Object.keys(cards).forEach(function (index) {
+      cards[index].parentNode.removeChild(cards[index]);
+    });
+  };
+  // доабавление пинов на карту
   var mapPins = map.querySelector('.map__pins');
+
   var objects = createObjects();
   var buttons = createButtons(objects);
   mapPins.appendChild(buttons);
-  var popup = createPopup(objects[0]);
-  map.appendChild(popup);
   map.classList.remove('map--faded');
+
+  // удаление с формы класса ad-form--disabled и атрибута disabled со всех fieldeset
+  var fieldsetAll = document.querySelectorAll('fieldset');
+  var noticeForm = document.querySelector('.ad-form');
+  noticeForm.classList.remove('ad-form--disabled');
+  for (var v = 0; v < fieldsetAll.length; v++) {
+    var fieldsetIndex = fieldsetAll[v];
+    fieldsetIndex.removeAttribute('disabled');
+  }
+
+
+  // функция заполнения поля формы "адресс"
+  var getLocationInitial = function (mainpin, address) {
+    var location = {
+      locationX: mainpin.offsetLeft + Math.ceil(mainpin.offsetWidth / 2),
+      locationY: mainpin.offsetTop + mainpin.offsetHeight + MAIN_PIN_AFFTER
+    };
+    address.value = location.locationX + ', ' + location.locationY;
+  };
+
+  getLocationInitial(mapPinMain, addressInput);
+  var pins = document.querySelectorAll('.map__pin');
+  for (var j = 0; j< pins.length; j++) {
+    if (pins[j].classList.length < 2) {
+      pins[j].addEventListener('click', function () {
+        createPopup(objects[j]);
+      });
+    }
+  }
 };
-greateMapElement();
+
+// заполнение поле формы Адресс при начальной загрузки страницы
+var createStartAdress = function () {
+  var locationMapPinMain = {
+    x: mapPinMain.offsetLeft + Math.ceil(mapPinMain.offsetWidth / 2),
+    y: mapPinMain.offsetTop + Math.ceil(mapPinMain.offsetHeight / 2)
+  };
+
+  addressInput.value = locationMapPinMain.x + ', ' + locationMapPinMain.y;
+};
+
+createStartAdress();
+// действия при отпускании нажатой кнопки  с главного пина
+mapPinMain.addEventListener('mouseup', greateMapElement);
+

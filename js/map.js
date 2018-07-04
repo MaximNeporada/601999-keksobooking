@@ -54,7 +54,7 @@ var createStartAddress = function () {
     x: mapPinMain.offsetLeft + Math.ceil(mapPinMain.offsetWidth / 2),
     y: mapPinMain.offsetTop + Math.ceil(mapPinMain.offsetHeight / 2)
   };
-
+  addressInput.disabled = true;
   addressInput.value = locationMapPinMain.x + ', ' + locationMapPinMain.y;
 };
 

@@ -38,8 +38,6 @@
     'http://o0.github.io/assets/images/tokyo/hotel3.jpg'
   ];
 
-
-
   // функция получения случайного числа от min до max не включая max
   var getRandomInt = function (min, max) {
     return Math.floor(Math.random() * (max - min)) + min;

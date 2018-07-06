@@ -1,7 +1,6 @@
 'use strict';
 (function () {
-  var noticeForm = document.querySelector('.ad-form');
-  var noticeFieldset = document.querySelectorAll("fieldset");
+
   var mapPinMain = document.querySelector('.map__pin--main');
   var noticeType = document.querySelector('#type');
   var noticePrice = document.querySelector('#price');
@@ -9,8 +8,6 @@
   var noticeTimeout = document.querySelector('#timeout');
   var noticeRoomNumber = document.querySelector('#room_number');
   var noticeCapacity = document.querySelector('#capacity');
-  var noticeFormReset = document.querySelector('.ad-form__reset');
-  var successMessage = document.querySelector('.success');
   window.addressInput = document.querySelector('#address');
   var MAX_GUESTS_PER_ROOM = 1;
   var ROOMS_CAPACITY_VALUE = {

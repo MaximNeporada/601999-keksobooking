@@ -16,7 +16,7 @@
     right: window.map.offsetWidth - PIN_MAIN_WIDTH
   };
 
-  var clickPinEvents = function(objects) {
+  var clickPinEvents = function (objects) {
     var arrayPin = document.querySelectorAll('.map__pin:not(.map__pin--main)');
     for (var i = 0; i < arrayPin.length; i++) {
       var pin = arrayPin[i];
@@ -28,6 +28,7 @@
       }(objectIndex));
     }
   };
+
   var greateMapElement = function () {
 
     // доабавление пинов на карту

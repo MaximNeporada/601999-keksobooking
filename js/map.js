@@ -127,8 +127,8 @@ var setGuestsValidity = function (field) {
   if ((roomsCapacityValue.capacity / roomsCapacityValue.rooms) > MAX_GUESTS_PER_ROOM) {
     field.setCustomValidity('Количество гостей превышает максимально возможное. \nКоличество комнат должно быть не меньше ' + (roomsCapacityValue.capacity / MAX_GUESTS_PER_ROOM) + '.');
   } else if (roomsCapacityValue.capacity === '0' && roomsCapacityValue.rooms !== '100') {
-      field.setCustomValidity('Выберите вариант: 100 комнат.');
-    } else if (roomsCapacityValue.capacity !== '0' && roomsCapacityValue.rooms === '100') {
+    field.setCustomValidity('Выберите вариант: 100 комнат.');
+  } else if (roomsCapacityValue.capacity !== '0' && roomsCapacityValue.rooms === '100') {
     field.setCustomValidity('100 комнат - не для гостей');
   } else {
     field.setCustomValidity('');
@@ -168,15 +168,17 @@ var createRandomArray = function (array, count, sort) {
 // функция создания массива объектов
 var createObjects = function () {
   var objects = [];
+  var avatarsArray = AVATARS;
   var COUNT_ELEMENT = 8;
   for (var i = 0; i < COUNT_ELEMENT; i++) {
-    var avatarsIndex = getRandomInt(0, AVATARS.length);
+    var avatarsIndex = getRandomInt(0, avatarsArray.length);
     var titlesIndex = getRandomInt(0, TITLES.length);
     var locationX = getRandomInt(300, 1051);
     var locationY = getRandomInt(130, 630);
+    var avatarsElement = avatarsArray[avatarsIndex];
     objects.push({
       'author': {
-        'avatar': AVATARS[avatarsIndex]
+        'avatar': avatarsElement
       },
       'offer': {
         'title': TITLES[titlesIndex],
@@ -196,8 +198,6 @@ var createObjects = function () {
         'y': locationY
       }
     });
-    AVATARS.splice(avatarsIndex, 1);
-    TITLES.splice(titlesIndex, 1);
   }
 
   return objects;
@@ -226,8 +226,9 @@ var createButtons = function (objects) {
 var createPhoto = function (arrayPhoto, photoElement, photoBlock) {
   for (var l = 0; l < arrayPhoto.length; l++) {
     var photo = photoElement.cloneNode(true);
+    var photoArr = arrayPhoto[l];
     photo.style.verticalAlign = 'bottom';
-    photo.src = arrayPhoto[l];
+    photo.src = photoArr;
     photo.width = 63;
     photo.style.marginRight = 5 + 'px';
     photoBlock.appendChild(photo);
@@ -303,12 +304,21 @@ var showPopup = function (object) {
   removePopup();
   createPopup(object);
 };
-
+// функция очистки карты
+var clearMapPin = function () {
+  var mapPinElements = map.querySelectorAll('.map__pin:not(.map__pin--main)');
+  for (var i = 0; i < mapPinElements.length; i++) {
+    var mapPinElement = mapPinElements[i];
+    mapPinElement.remove();
+  }
+};
 
 var greateMapElement = function () {
-
-  // доабавление пинов на карту
   var mapPins = map.querySelector('.map__pins');
+  // очищение пинов с карты
+  clearMapPin();
+  // доабавление пинов на карту
+
   var objects = createObjects();
   var buttons = createButtons(objects);
   mapPins.appendChild(buttons);
@@ -342,5 +352,76 @@ var greateMapElement = function () {
 
 createStartAddress();
 
-// действия при отпускании нажатой кнопки  с главного пина
-mapPinMain.addEventListener('mouseup', greateMapElement);
+
+var PIN_MAIN_WIDTH = 65;
+var PIN_MAIN_HEIGHT = 87;
+var MOVE_LIMIT_TOP = 200;
+var MOVE_LIMIT_BOTTOM = 600;
+
+var pinMainPosLeft = mapPinMain.offsetLeft;
+var pinMainPosTop = mapPinMain.offsetTop;
+
+var moveLimits = {
+  top: map.offsetTop - PIN_MAIN_HEIGHT + MOVE_LIMIT_TOP,
+  left: map.offsetLeft - PIN_MAIN_WIDTH / 2,
+  bottom: map.offsetTop - PIN_MAIN_HEIGHT + MOVE_LIMIT_BOTTOM,
+  right: map.offsetWidth - PIN_MAIN_WIDTH
+};
+var setPinMainAddress = function (left, top, width, height) {
+  addressInput.disabled = true;
+  addressInput.value = (left + width / 2) + ', ' + (top + height);
+};
+
+mapPinMain.addEventListener('mousedown', function (evt) {
+  var startCoords = {
+    x: evt.clientX,
+    y: evt.clientY
+  };
+
+  var onMouseMove = function (moveEvt) {
+    moveEvt.preventDefault();
+
+    var shift = {
+      x: startCoords.x - moveEvt.clientX,
+      y: startCoords.y - moveEvt.clientY
+    };
+
+    startCoords = {
+      x: moveEvt.clientX,
+      y: moveEvt.clientY
+    };
+
+    pinMainPosLeft = mapPinMain.offsetLeft - shift.x;
+    pinMainPosTop = mapPinMain.offsetTop - shift.y;
+
+    mapPinMain.style.left = pinMainPosLeft + 'px';
+
+    if (pinMainPosLeft > moveLimits.right) {
+      mapPinMain.style.left = moveLimits.right + 'px';
+    } else if (pinMainPosLeft < moveLimits.left) {
+      mapPinMain.style.left = moveLimits.left + 'px';
+    }
+
+    mapPinMain.style.top = pinMainPosTop + 'px';
+
+    if (pinMainPosTop > moveLimits.bottom) {
+      mapPinMain.style.top = moveLimits.bottom + 'px';
+    } else if (pinMainPosTop < moveLimits.top) {
+      mapPinMain.style.top = moveLimits.top + 'px';
+    }
+
+    setPinMainAddress(pinMainPosLeft, pinMainPosTop, PIN_MAIN_WIDTH, PIN_MAIN_HEIGHT);
+  };
+
+  var onMouseUp = function (upEvt) {
+    upEvt.preventDefault();
+    greateMapElement();
+    setPinMainAddress(pinMainPosLeft, pinMainPosTop, PIN_MAIN_WIDTH, PIN_MAIN_HEIGHT);
+    document.removeEventListener('mousemove', onMouseMove);
+    document.removeEventListener('mouseup', onMouseUp);
+  };
+
+  document.addEventListener('mousemove', onMouseMove);
+  document.addEventListener('mouseup', onMouseUp);
+
+});

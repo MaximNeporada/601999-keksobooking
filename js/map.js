@@ -6,6 +6,7 @@
   var PIN_MAIN_HEIGHT = 87;
   var MOVE_LIMIT_TOP = 200;
   var MOVE_LIMIT_BOTTOM = 700;
+  // var PIN_MAIN_START_COORDS = {x: 570, y: 375};
   var pinMainPosLeft = mapPinMain.offsetLeft;
   var pinMainPosTop = mapPinMain.offsetTop;
   var moveLimits = {
@@ -15,30 +16,46 @@
     right: window.map.offsetWidth - PIN_MAIN_WIDTH
   };
 
-  var greateMapElement = function () {
-    var mapPins = window.map.querySelector('.map__pins');
-    // очищение пинов с карты
-    window.clearMapPin();
-    // доабавление пинов на карту
-
-    var objects = window.objects;
-    var buttons = window.createButtons(objects);
-    mapPins.appendChild(buttons);
-    window.map.classList.remove('map--faded');
-
-    // добавление событие клика пинам
+  var clickPinEvents = function (objects) {
     var arrayPin = document.querySelectorAll('.map__pin:not(.map__pin--main)');
-    for (var m = 0; m < arrayPin.length; m++) {
-      var objectIndex = objects[m];
-      var pin = arrayPin[m];
-
+    for (var i = 0; i < arrayPin.length; i++) {
+      var pin = arrayPin[i];
+      var objectIndex = objects[i];
       pin.addEventListener('click', function (object) {
         return function () {
           window.showPopup(object);
         };
       }(objectIndex));
     }
+  };
 
+  var greateMapElement = function () {
+
+    // доабавление пинов на карту
+
+    var getError = function (errorMessage) {
+      var errorElement = document.createElement('div');
+
+      errorElement.style = 'z-index: 99; margin: 0 auto; text-align: center; background-color: red;';
+      errorElement.style.position = 'fixed';
+      errorElement.style.left = 0;
+      errorElement.style.right = 0;
+      errorElement.style.fontSize = '30px';
+
+      errorElement.textContent = errorMessage;
+      document.body.insertAdjacentElement('afterbegin', errorElement);
+
+    };
+
+
+    window.load(window.createButtons, getError);
+
+    window.map.classList.remove('map--faded');
+
+    // добавление событие клика пинам
+
+
+    window.load(clickPinEvents, getError);
     // удаление с формы класса ad-form--disabled и атрибута disabled со всех fieldeset
     var fieldsetAll = document.querySelectorAll('fieldset');
     var noticeForm = document.querySelector('.ad-form');

@@ -1,5 +1,6 @@
 'use strict';
 (function () {
+
   var mapPinMain = document.querySelector('.map__pin--main');
   var noticeType = document.querySelector('#type');
   var noticePrice = document.querySelector('#price');
@@ -8,7 +9,7 @@
   var noticeRoomNumber = document.querySelector('#room_number');
   var noticeCapacity = document.querySelector('#capacity');
   window.addressInput = document.querySelector('#address');
-
+  var MAX_GUESTS_PER_ROOM = 1;
   var ROOMS_CAPACITY_VALUE = {
     rooms: 1,
     capacity: 1
@@ -20,7 +21,6 @@
     house: 5000,
     palace: 10000
   };
-  var MAX_GUESTS_PER_ROOM = 1;
   var MAIN_PIN_AFFTER = 22;// взято из css
 
   var getDependentOption = function (option, dependentArray) {

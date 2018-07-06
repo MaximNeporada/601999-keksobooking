@@ -73,7 +73,15 @@
     // нажатие на кнопку крестик попапа
     var buttonClosePopup = document.querySelector('.popup__close');
     buttonClosePopup.addEventListener('click', removePopup);
+    buttonClosePopup.addEventListener('keydown', function (evt) {
+      window.util.isEnterEvent(evt, removePopup);
+    });
+    popup.addEventListener('keydown', function (evt) {
+      window.util.isEscEvent(evt, removePopup);
+    });
   };
+
+
   // функция вызова попапа
   window.showPopup = function (object) {
     removePopup();

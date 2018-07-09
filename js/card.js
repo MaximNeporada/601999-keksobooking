@@ -38,7 +38,7 @@
   window.removePopup = function () {
     var cards = document.querySelectorAll('.map__card');
     var pins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
-    for (var i = 0; i < pins.length; i++){
+    for (var i = 0; i < pins.length; i++) {
       pins[i].classList.remove('map__pin--active');
     }
     Object.keys(cards).forEach(function (index) {

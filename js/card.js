@@ -5,8 +5,13 @@
     'bungalo': 'Бунгало',
     'house': 'Дом'
   };
+  var ESC_KEYCODE = 27;
   window.map = document.querySelector('.map');
-
+  window.escPressHandler = function (evt, action) {
+    if (evt.keyCode === ESC_KEYCODE) {
+      action();
+    }
+  };
   // функция создания и установка фотографий
   var createPhoto = function (arrayPhoto, photoElement, photoBlock) {
     for (var l = 0; l < arrayPhoto.length; l++) {
@@ -21,7 +26,7 @@
   };
 
   // функция установки опций
-  var greateOption = function (arrayOption, OptionBlock) {
+  var createOption = function (arrayOption, OptionBlock) {
     for (var j = 0; j < arrayOption.length; j++) {
       var li = document.createElement('LI');
       li.classList.add('feature', 'feature--' + arrayOption[j]);
@@ -30,8 +35,12 @@
   };
 
   // функции очиски карты от попапов
-  var removePopup = function () {
+  window.removePopup = function () {
     var cards = document.querySelectorAll('.map__card');
+    var pins = document.querySelectorAll('.map__pin:not(.map__pin--main)');
+    for (var i = 0; i < pins.length; i++) {
+      pins[i].classList.remove('map__pin--active');
+    }
     Object.keys(cards).forEach(function (index) {
       cards[index].parentNode.removeChild(cards[index]);
     });
@@ -61,7 +70,7 @@
     var popupFeatures = popup.querySelector('.popup__features');
     popupFeatures.innerHTML = '';
     var arrayFeatures = object.offer.features;
-    greateOption(arrayFeatures, popupFeatures);// установка опций
+    createOption(arrayFeatures, popupFeatures);// установка опций
 
     popupFeatures.nextElementSibling.textContent = object.offer.description; // установка описания
 
@@ -72,19 +81,17 @@
 
     // нажатие на кнопку крестик попапа
     var buttonClosePopup = document.querySelector('.popup__close');
-    buttonClosePopup.addEventListener('click', removePopup);
-    buttonClosePopup.addEventListener('keydown', function (evt) {
-      window.util.isEnterEvent(evt, removePopup);
-    });
-    popup.addEventListener('keydown', function (evt) {
-      window.util.isEscEvent(evt, removePopup);
+    buttonClosePopup.addEventListener('click', window.removePopup);
+
+    window.map.addEventListener('keydown', function (evt) {
+      window.escPressHandler(evt, window.removePopup);
     });
   };
 
 
   // функция вызова попапа
   window.showPopup = function (object) {
-    removePopup();
+    window.removePopup();
     createPopup(object);
   };
 })();

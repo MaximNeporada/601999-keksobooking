@@ -1,14 +1,5 @@
 'use strict';
 (function () {
-
-  var mapPinMain = document.querySelector('.map__pin--main');
-  var noticeType = document.querySelector('#type');
-  var noticePrice = document.querySelector('#price');
-  var noticeTimein = document.querySelector('#timein');
-  var noticeTimeout = document.querySelector('#timeout');
-  var noticeRoomNumber = document.querySelector('#room_number');
-  var noticeCapacity = document.querySelector('#capacity');
-  window.addressInput = document.querySelector('#address');
   var MAX_GUESTS_PER_ROOM = 1;
   var ROOMS_CAPACITY_VALUE = {
     rooms: 1,
@@ -21,7 +12,24 @@
     house: 5000,
     palace: 10000
   };
+  window.addressInput = document.querySelector('#address');
+  window.noticeForm = document.querySelector('.ad-form');
+  window.mapPinMain = document.querySelector('.map__pin--main');
   var MAIN_PIN_AFFTER = 22;// взято из css
+  var noticeType = document.querySelector('#type');
+  var noticePrice = document.querySelector('#price');
+  var noticeTimein = document.querySelector('#timein');
+  var noticeTimeout = document.querySelector('#timeout');
+  var noticeRoomNumber = document.querySelector('#room_number');
+  var noticeCapacity = document.querySelector('#capacity');
+  var noticeReset = document.querySelector('.ad-form__reset');
+  var successMessage = document.querySelector('.success');
+  var adFormSubmit = document.querySelector('.ad-form__submit');
+  var locationMapPinMain = {
+    x: window.mapPinMain.offsetLeft + Math.ceil(window.mapPinMain.offsetWidth / 2),
+    y: window.mapPinMain.offsetTop + Math.ceil(window.mapPinMain.offsetHeight / 2)
+  };
+
 
   var getDependentOption = function (option, dependentArray) {
     var valueSelected = option.value;
@@ -53,6 +61,18 @@
 
     getDependentOption(timeoutOption, noticeTimein);
   });
+  // функции проверки количества гостей
+  var setGuestsValidity = function (field) {
+    if ((ROOMS_CAPACITY_VALUE.capacity / ROOMS_CAPACITY_VALUE.rooms) > MAX_GUESTS_PER_ROOM) {
+      field.setCustomValidity('Количество гостей превышает максимально возможное. \nКоличество комнат должно быть не меньше ' + (ROOMS_CAPACITY_VALUE.capacity / MAX_GUESTS_PER_ROOM) + '.');
+    } else if (ROOMS_CAPACITY_VALUE.capacity === '0' && ROOMS_CAPACITY_VALUE.rooms !== '100') {
+      field.setCustomValidity('Выберите вариант: 100 комнат.');
+    } else if (ROOMS_CAPACITY_VALUE.capacity !== '0' && ROOMS_CAPACITY_VALUE.rooms === '100') {
+      field.setCustomValidity('100 комнат - не для гостей');
+    } else {
+      field.setCustomValidity('');
+    }
+  };
 
   // событие при изменение количесива комнат
   noticeRoomNumber.addEventListener('change', function (evt) {
@@ -79,34 +99,68 @@
     setGuestsValidity(noticeCapacity);
   });
 
-  // функции проверки количества гостей
-  var setGuestsValidity = function (field) {
-    if ((ROOMS_CAPACITY_VALUE.capacity / ROOMS_CAPACITY_VALUE.rooms) > MAX_GUESTS_PER_ROOM) {
-      field.setCustomValidity('Количество гостей превышает максимально возможное. \nКоличество комнат должно быть не меньше ' + (ROOMS_CAPACITY_VALUE.capacity / MAX_GUESTS_PER_ROOM) + '.');
-    } else if (ROOMS_CAPACITY_VALUE.capacity === '0' && ROOMS_CAPACITY_VALUE.rooms !== '100') {
-      field.setCustomValidity('Выберите вариант: 100 комнат.');
-    } else if (ROOMS_CAPACITY_VALUE.capacity !== '0' && ROOMS_CAPACITY_VALUE.rooms === '100') {
-      field.setCustomValidity('100 комнат - не для гостей');
-    } else {
-      field.setCustomValidity('');
-    }
-  };
 
   // функция заполнения поля формы "адресс"
   window.getLocationInitial = function (mainPin, address) {
     var location = {
-      locationX: mainPin.offsetLeft + Math.round(mainPin.offsetWidth / 2),
+      locationX: mainPin.offsetLeft + Math.ceil(mainPin.offsetWidth / 2),
       locationY: mainPin.offsetTop + mainPin.offsetHeight + MAIN_PIN_AFFTER
     };
     address.value = location.locationX + ', ' + location.locationY;
   };
 
   // заполнение поле формы Адресс при начальной загрузки страницы
-  var locationMapPinMain = {
-    x: mapPinMain.offsetLeft + Math.ceil(mapPinMain.offsetWidth / 2),
-    y: mapPinMain.offsetTop + Math.ceil(mapPinMain.offsetHeight / 2)
-  };
+
   window.addressInput.disabled = true;
   window.addressInput.value = locationMapPinMain.x + ', ' + locationMapPinMain.y;
 
+  // событие нажати на кнопку reset
+  noticeReset.addEventListener('click', function (evt) {
+    evt.preventDefault();
+    returnNegativeState();
+  });
+  adFormSubmit.addEventListener('click', function () {
+    setGuestsValidity(noticeCapacity);
+  });
+
+  // функция возврата в исходное состояние страницы
+  var returnNegativeState = function () {
+    window.noticeForm.reset();
+    window.removePopup();
+    window.clearMapPin();
+    window.map.classList.add('map--faded');
+    window.noticeForm.classList.add('ad-form--disabled');
+    window.addressInput.disabled = true;
+    window.addressInput.value = locationMapPinMain.x + ', ' + locationMapPinMain.y;
+    var mapPinCenterX = locationMapPinMain.x - window.mapPinMain.offsetWidth / 2;
+    var mapPinCenterY = locationMapPinMain.y - window.mapPinMain.offsetHeight / 2;
+    window.mapPinMain.style.left = mapPinCenterX + 'px';
+    window.mapPinMain.style.top = mapPinCenterY + 'px';
+    for (var v = 0; v < window.fieldsetAll.length; v++) {
+      var fieldsetIndex = window.fieldsetAll[v];
+      fieldsetIndex.setAttribute('disabled', '');
+    }
+    window.scrollTo(0, 0);
+  };
+  // функции закрытия меседжера
+  var messageEscPressHandler = function (evt) {
+    window.escPressHandler(evt, closeSuccessMessageHandler);
+  };
+
+  var closeSuccessMessageHandler = function () {
+    successMessage.classList.add('hidden');
+    document.removeEventListener('click', closeSuccessMessageHandler);
+    document.removeEventListener('keydown', messageEscPressHandler);
+  };
+  // событие нажатие на кнопку опубликовать
+  var successHandler = function () {
+    returnNegativeState();
+    successMessage.classList.remove('hidden');
+    document.addEventListener('click', closeSuccessMessageHandler);
+    document.addEventListener('keydown', messageEscPressHandler);
+  };
+  window.noticeForm.addEventListener('submit', function (evt) {
+    evt.preventDefault();
+    window.upload(new FormData(window.noticeForm), successHandler, window.getError);
+  });
 })();

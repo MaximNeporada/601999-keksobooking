@@ -6,12 +6,15 @@
     'house': 'Дом'
   };
   var ESC_KEYCODE = 27;
+
   window.map = document.querySelector('.map');
+
   window.escPressHandler = function (evt, action) {
     if (evt.keyCode === ESC_KEYCODE) {
       action();
     }
   };
+
   // функция создания и установка фотографий
   var createPhoto = function (arrayPhoto, photoElement, photoBlock) {
     for (var l = 0; l < arrayPhoto.length; l++) {
@@ -87,7 +90,6 @@
       window.escPressHandler(evt, window.removePopup);
     });
   };
-
 
   // функция вызова попапа
   window.showPopup = function (object) {

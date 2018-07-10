@@ -17,12 +17,15 @@
     house: 5000,
     palace: 10000
   };
+  var MIN_TITLE_LENGTH = 30;
+  var MAX_TITLE_LENGTH = 100;
   var MAIN_PIN_AFFTER = 22;// взято из css
 
   window.addressInput = document.querySelector('#address');
   window.noticeForm = document.querySelector('.ad-form');
   window.mapPinMain = document.querySelector('.map__pin--main');
 
+  var noticeTitle = document.querySelector('#title');
   var noticeType = document.querySelector('#type');
   var noticePrice = document.querySelector('#price');
   var noticeTimein = document.querySelector('#timein');
@@ -68,6 +71,17 @@
     getDependentOption(timeoutOption, noticeTimein);
   });
 
+  // функции проверки длины заголовка
+  var setTitleValidity = function (field) {
+    if (MIN_TITLE_LENGTH > field.value.length) {
+      field.setCustomValidity('Длина заголовка должна быть не меньше ' + MIN_TITLE_LENGTH + '. Cейчас: ' + field.value.length);
+    } else if (MAX_TITLE_LENGTH < field.value.length) {
+      field.setCustomValidity('Длина заголовка должна быть не больше ' + MAX_TITLE_LENGTH + '.');
+    } else {
+      field.setCustomValidity('');
+    }
+  };
+
   // функции проверки количества гостей
   var setGuestsValidity = function (field) {
     if ((ROOMS_CAPACITY_VALUE.capacity / ROOMS_CAPACITY_VALUE.rooms) > MAX_GUESTS_PER_ROOM) {
@@ -77,6 +91,16 @@
     } else if (ROOMS_CAPACITY_VALUE.capacity !== '0' && ROOMS_CAPACITY_VALUE.rooms === '100') {
       field.setCustomValidity('100 комнат - не для гостей');
     } else {
+      field.setCustomValidity('');
+    }
+  };
+
+  // функция проверки цены
+  var setPriceValidity = function (field) {
+    var fieldMin = field.min;
+    if (field.value < fieldMin) {
+      field.setCustomValidity('Цена должна быть не ниже ' + fieldMin + '.');
+    }  else {
       field.setCustomValidity('');
     }
   };
@@ -130,6 +154,8 @@
 
   adFormSubmit.addEventListener('click', function () {
     setGuestsValidity(noticeCapacity);
+    setTitleValidity(noticeTitle);
+    setPriceValidity(noticePrice);
   });
 
   // функция возврата в исходное состояние страницы

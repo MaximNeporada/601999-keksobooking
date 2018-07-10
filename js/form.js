@@ -81,6 +81,9 @@
       field.setCustomValidity('');
     }
   };
+  noticeTitle.addEventListener('change', function () {
+    setTitleValidity(noticeTitle);
+  });
 
   // функции проверки количества гостей
   var setGuestsValidity = function (field) {
@@ -100,11 +103,14 @@
     var fieldMin = field.min;
     if (field.value < fieldMin) {
       field.setCustomValidity('Цена должна быть не ниже ' + fieldMin + '.');
-    }  else {
+    } else {
       field.setCustomValidity('');
     }
   };
 
+  noticePrice.addEventListener('change', function () {
+    setPriceValidity(noticePrice);
+  });
   // событие при изменение количесива гостей
   noticeCapacity.addEventListener('change', function (evt) {
     var capacityOption = evt.target;
